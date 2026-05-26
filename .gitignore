@@ -52,4 +52,8 @@ Thumbs.db
 Project-3/backend/checkpoints/model_custom.pth
 Project-3/backend/checkpoints/vocab.json
 Project-3/backend/checkpoints/train_status.json
-Project-3/.cache/
+Project-3/.cache/
+
+# Non-CODSOFT projects
+StudyMate_AI/
+
