@@ -1,0 +1,122 @@
+{
+  "intents": [
+    {
+      "name": "greeting",
+      "patterns": ["\\b(hi|hello|hey|namaste|good morning|good afternoon|good evening)\\b"],
+      "keywords": ["hi", "hello", "hey", "namaste", "good morning"],
+      "responses": [
+        "Hello{user_name}! How can I help you today?",
+        "Hi{user_name}! What would you like to talk about?",
+        "Hey{user_name}! I am ready to help."
+      ]
+    },
+    {
+      "name": "farewell",
+      "patterns": ["\\b(bye|goodbye|see you|exit|quit|take care)\\b"],
+      "keywords": ["bye", "goodbye", "see you", "exit", "quit"],
+      "responses": [
+        "Goodbye{user_name}! Thanks for chatting.",
+        "See you later{user_name}. Have a great day!",
+        "Take care{user_name}!"
+      ]
+    },
+    {
+      "name": "bot_identity",
+      "patterns": ["\\b(who are you|what is your name|what's your name|your name|introduce yourself)\\b"],
+      "keywords": ["who are you", "your name", "introduce yourself"],
+      "responses": [
+        "I am an intelligent rule-based chatbot built with Python, Flask, regex, fuzzy matching, and JSON storage.",
+        "My name is IntelliBot. I answer using rule-based intent detection and conversation context."
+      ]
+    },
+    {
+      "name": "programming",
+      "patterns": ["\\b(python|programming|code|coding|bug|debug|function|loop|variable|flask|html|css|javascript)\\b"],
+      "keywords": ["python", "programming", "code", "coding", "debug", "function", "flask", "javascript"],
+      "responses": [
+        "Programming tip: break the problem into small steps, test each step, and read error messages carefully.",
+        "Python is a great language for beginners because its syntax is readable and it has many useful libraries.",
+        "For coding help, share the error, the relevant code, and what you expected to happen."
+      ]
+    },
+    {
+      "name": "time_date",
+      "patterns": ["\\b(time|date|today|day is it|current time)\\b"],
+      "keywords": ["time", "date", "today", "current time"],
+      "responses": [
+        "The current date and time is {now}.",
+        "Right now it is {now}."
+      ]
+    },
+    {
+      "name": "math",
+      "patterns": ["\\b(calculate|solve|math|plus|minus|multiply|divide)\\b|\\d+\\s*[+\\-*/]\\s*\\d+"],
+      "keywords": ["calculate", "solve", "math", "plus", "minus", "multiply", "divide"],
+      "responses": [
+        "The answer is {math_result}.",
+        "I calculated it as {math_result}."
+      ]
+    },
+    {
+      "name": "joke",
+      "patterns": ["\\b(joke|funny|make me laugh|humor)\\b"],
+      "keywords": ["joke", "funny", "laugh", "humor"],
+      "responses": [
+        "Why do programmers prefer dark mode? Because light attracts bugs.",
+        "Why did the Python developer bring a ladder? To reach a higher level of abstraction.",
+        "I told my computer I needed a break, and it opened too many tabs."
+      ]
+    },
+    {
+      "name": "help",
+      "patterns": ["\\b(help|what can you do|features|commands|guide me)\\b"],
+      "keywords": ["help", "what can you do", "features", "commands", "guide"],
+      "responses": [
+        "I can chat, answer simple programming questions, tell jokes, calculate basic math, remember your name, respond to mood, and show confidence scores.",
+        "Try asking about Python, the current date, a joke, a math problem, or tell me your name."
+      ]
+    },
+    {
+      "name": "small_talk",
+      "patterns": ["\\b(how are you|how is it going|nice to meet you|thank you|thanks)\\b"],
+      "keywords": ["how are you", "nice to meet you", "thank you", "thanks"],
+      "responses": [
+        "I am doing well and ready to help{user_name}.",
+        "Thanks for asking{user_name}. I am running smoothly.",
+        "You are welcome{user_name}!"
+      ]
+    },
+    {
+      "name": "mood_feelings",
+      "patterns": ["\\b(i am|i'm|im|feeling)\\s+(sad|happy|excited|tired|angry|stressed|bored|great|good|bad)\\b"],
+      "keywords": ["sad", "happy", "excited", "tired", "angry", "stressed", "bored", "great"],
+      "responses": [
+        "Thanks for sharing that{user_name}. I will remember you are feeling {mood}.",
+        "I hear you{user_name}. Feeling {mood} is worth paying attention to."
+      ]
+    },
+    {
+      "name": "name_capture",
+      "patterns": ["\\b(my name is|i am|i'm|call me)\\s+([a-zA-Z][a-zA-Z ]{1,30})\\b"],
+      "keywords": ["my name is", "call me"],
+      "responses": [
+        "Nice to meet you, {captured_name}. I will remember your name.",
+        "Got it, {captured_name}. I will call you that."
+      ]
+    },
+    {
+      "name": "name_recall",
+      "patterns": ["\\b(what is my name|what's my name|do you remember my name)\\b"],
+      "keywords": ["what is my name", "remember my name"],
+      "responses": [
+        "Your name is {known_name}.",
+        "I remember you as {known_name}."
+      ]
+    }
+  ],
+  "fallbacks": [
+    "I am not fully sure about that yet. You can ask me about programming, jokes, math, time, mood, or help.",
+    "I do not have a strong rule for that question yet. I logged it so the developer can improve my intents.",
+    "That is outside my current rules, but I can still learn from this interaction through analytics."
+  ]
+}

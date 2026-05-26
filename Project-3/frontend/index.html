@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visuallink AI - Image Captioning Dashboard</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="logo">
+                <i class="fa-solid fa-brain logo-icon"></i>
+                <span class="logo-text">VisualLink<span>AI</span></span>
+            </div>
+            
+            <nav class="nav-menu">
+                <div class="nav-section">Model Control</div>
+                <div class="training-panel">
+                    <h3><i class="fa-solid fa-sliders"></i> Custom Model Training</h3>
+                    <p class="description">Train the custom ResNet50 + LSTM model on a synthetic dataset of color blocks to demonstrate features learning.</p>
+                    
+                    <div class="training-status-card">
+                        <div class="status-row">
+                            <span class="status-label">Status:</span>
+                            <span id="training-status" class="status-value status-idle">Idle</span>
+                        </div>
+                        <div class="progress-bar-container">
+                            <div id="training-progress" class="progress-bar"></div>
+                        </div>
+                        <div class="status-row mt-2">
+                            <span id="epoch-label" class="status-label">Epoch: --/--</span>
+                            <span id="loss-label" class="status-value font-mono">Loss: --</span>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mt-3">
+                        <label for="epochs-input">Training Epochs:</label>
+                        <input type="number" id="epochs-input" value="30" min="5" max="100" class="input-control">
+                    </div>
+                    
+                    <button id="btn-train" class="btn btn-primary btn-block">
+                        <i class="fa-solid fa-play"></i> Start Custom Training
+                    </button>
+                </div>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <div class="system-status">
+                    <span class="pulse-indicator"></span>
+                    <span>System Online (CPU)</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="app-header">
+                <h1>Image Captioning AI</h1>
+                <p>Upload an image to see deep learning captions from a custom RNN model and a pre-trained Transformer model.</p>
+            </header>
+
+            <div class="dashboard-grid">
+                
+                <!-- Left: Upload & Input Area -->
+                <div class="card upload-card">
+                    <h2><i class="fa-solid fa-upload"></i> Input Image</h2>
+                    <div class="dropzone" id="dropzone">
+                        <input type="file" id="file-input" accept="image/*" style="display: none;">
+                        <div class="dropzone-content">
+                            <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                            <p class="primary-text">Drag & drop your image here</p>
+                            <p class="secondary-text">or click to browse your files</p>
+                        </div>
+                        <img id="image-preview" class="preview-img hidden" alt="Upload Preview">
+                    </div>
+                    
+                    <div class="quick-samples">
+                        <h3>Quick Color Samples (for Custom Model testing)</h3>
+                        <div class="color-blocks">
+                            <div class="color-block red" data-color="red" title="Red block"></div>
+                            <div class="color-block green" data-color="green" title="Green block"></div>
+                            <div class="color-block blue" data-color="blue" title="Blue block"></div>
+                            <div class="color-block yellow" data-color="yellow" title="Yellow block"></div>
+                            <div class="color-block white" data-color="white" title="White block"></div>
+                            <div class="color-block black" data-color="black" title="Black block"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Model Predictions -->
+                <div class="results-container">
+                    
+                    <!-- Pretrained Model Card -->
+                    <div class="card result-card">
+                        <div class="card-header">
+                            <span class="badge badge-purple">Transformer</span>
+                            <h2>Pre-trained BLIP Model</h2>
+                        </div>
+                        <div class="caption-display">
+                            <p id="pretrained-caption" class="placeholder-text">Upload an image to generate caption...</p>
+                        </div>
+                        <div class="model-info">
+                            <i class="fa-solid fa-circle-info"></i> Salesforce BLIP Base model (Image-to-Text Transformer)
+                        </div>
+                    </div>
+
+                    <!-- Custom Model Card -->
+                    <div class="card result-card">
+                        <div class="card-header">
+                            <span class="badge badge-blue">CNN + LSTM</span>
+                            <h2>Custom Attention Model</h2>
+                        </div>
+                        <div class="caption-display">
+                            <p id="custom-caption" class="placeholder-text">Upload an image to generate caption...</p>
+                        </div>
+                        <div class="model-info">
+                            <i class="fa-solid fa-circle-info"></i> ResNet50 Encoder + LSTM Decoder with Bahdanau Attention
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+
+            <!-- Attention Maps Segment (Full Width) -->
+            <section class="card attention-card mt-4 hidden" id="attention-section">
+                <div class="card-header">
+                    <span class="badge badge-green">Visual Attention</span>
+                    <h2>Word-by-Word Attention Mapping</h2>
+                </div>
+                <p class="description">Click or hover over any word in the generated custom caption below to see which region of the image the LSTM decoder focused on (red indicates highest attention weight).</p>
+                
+                <div class="attention-workspace">
+                    <div class="interactive-caption" id="interactive-words">
+                        <!-- Words will be dynamically injected here -->
+                    </div>
+                    <div class="attention-viewer">
+                        <div class="viewer-window">
+                            <img id="attention-map-img" src="" alt="Attention Overlay">
+                            <div class="viewer-overlay" id="viewer-word-label">Selected Word</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inference History Segment -->
+            <section class="card history-card mt-4">
+                <h2><i class="fa-solid fa-history"></i> Run History</h2>
+                <div class="history-grid" id="history-grid">
+                    <div class="history-placeholder">No captions generated yet. Start by uploading an image!</div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
