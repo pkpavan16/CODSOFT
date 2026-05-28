@@ -1,0 +1,13 @@
+{
+  "name": "face-detection-recognition-app",
+  "version": "1.0.0",
+  "description": "AI face detection and recognition application using face-api.js",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server -p 8080 -c-1"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+}

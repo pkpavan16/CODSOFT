@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aegis Face AI - Real-time Face Detection & Recognition Dashboard</title>
+  <!-- Google Fonts: Space Grotesk & Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons (CDN) for modern icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <!-- face-api.js Maintained by Vlad Mandic -->
+  <script src="https://cdn.jsdelivr.net/npm/@vladmandic/face-api/dist/face-api.js"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="glow-bg"></div>
+  
+  <div class="app-container">
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo-area">
+        <i data-lucide="shield-check" class="logo-icon"></i>
+        <div>
+          <h1>AEGIS FACE AI</h1>
+          <p class="subtitle">Neural Face Detection & Recognition Engine</p>
+        </div>
+      </div>
+      <div class="system-status">
+        <div class="status-indicator">
+          <span class="status-dot status-loading" id="engineStatusDot"></span>
+          <span class="status-text" id="engineStatusText">Loading Models...</span>
+        </div>
+        <div class="stats-badges">
+          <div class="stat-badge">
+            <span class="badge-label">FPS</span>
+            <span class="badge-value" id="fpsVal">0</span>
+          </div>
+          <div class="stat-badge">
+            <span class="badge-label">Detected</span>
+            <span class="badge-value" id="detectCount">0</span>
+          </div>
+          <div class="stat-badge">
+            <span class="badge-label">Database</span>
+            <span class="badge-value" id="dbCount">0</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Grid Dashboard -->
+    <main class="dashboard-grid">
+      <!-- Left Column: Video Feed & Upload -->
+      <div class="column main-column">
+        <!-- Live Viewer Card -->
+        <div class="card viewer-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="video" class="icon-cyan"></i>
+              <h2>Live Camera Feed</h2>
+            </div>
+            <div class="camera-controls">
+              <button id="startCamBtn" class="btn btn-primary" disabled>
+                <i data-lucide="play"></i> Start Camera
+              </button>
+              <button id="stopCamBtn" class="btn btn-danger" disabled>
+                <i data-lucide="square"></i> Stop Camera
+              </button>
+            </div>
+          </div>
+          
+          <div class="viewer-viewport">
+            <div class="scanner-line" id="scannerLine"></div>
+            <div class="viewport-placeholder" id="viewportPlaceholder">
+              <i data-lucide="aperture" class="placeholder-icon rotating"></i>
+              <p>Camera offline. Start feed or upload media to analyze.</p>
+            </div>
+            
+            <video id="videoFeed" autoplay muted playsinline></video>
+            <img id="imageDisplay" alt="Uploaded analysis result">
+            <canvas id="overlayCanvas"></canvas>
+
+            <!-- Head Pose Guidance Scanning HUD -->
+            <div class="scan-hud hidden" id="scanHud">
+              <div class="hud-header">
+                <h3>Multi-Angle Registration</h3>
+                <span class="hud-profile-name" id="hudProfileName">John Doe</span>
+              </div>
+              <div class="hud-guidance">
+                <div class="hud-instruction" id="hudInstruction">Look directly Center</div>
+                <div class="hud-status-sub" id="hudStatusSub">Keep face inside the scan area</div>
+              </div>
+              <div class="hud-steps">
+                <div class="hud-step" id="stepCenter">
+                  <div class="step-dot"></div>
+                  <span>Center</span>
+                </div>
+                <div class="hud-step" id="stepLeft">
+                  <div class="step-dot"></div>
+                  <span>Left</span>
+                </div>
+                <div class="hud-step" id="stepRight">
+                  <div class="step-dot"></div>
+                  <span>Right</span>
+                </div>
+              </div>
+              <div class="hud-reticle-container">
+                <div class="hud-reticle"></div>
+                <div class="hud-reticle-indicator" id="hudReticleIndicator"></div>
+              </div>
+              <button id="cancelScanBtn" class="btn btn-cancel hud-cancel-btn">
+                <i data-lucide="x"></i> Cancel Scan
+              </button>
+            </div>
+          </div>
+
+          <div class="card-footer-actions">
+            <button id="registerCurrentBtn" class="btn btn-accent" disabled>
+              <i data-lucide="user-plus"></i> Register Detected Face
+            </button>
+            <div class="register-input-group hidden" id="registerQuickForm">
+              <input type="text" id="quickNameInput" placeholder="Enter person's name..." />
+              <button id="submitQuickRegisterBtn" class="btn btn-success">Save</button>
+              <button id="cancelQuickRegisterBtn" class="btn btn-cancel">Cancel</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- File Upload Card -->
+        <div class="card upload-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="upload-cloud" class="icon-magenta"></i>
+              <h2>Analyze Image / Video File</h2>
+            </div>
+          </div>
+          <div class="upload-zone" id="dropZone">
+            <input type="file" id="fileInput" accept="image/*,video/*" class="hidden-file-input">
+            <i data-lucide="image" class="upload-icon"></i>
+            <p class="upload-text">Drag & drop files here or <span class="browse-link">browse</span></p>
+            <p class="upload-subtext">Supports PNG, JPG, MP4 (max 25MB)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Settings & Database -->
+      <div class="column sidebar-column">
+        <!-- AI Settings Card -->
+        <div class="card settings-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="sliders" class="icon-amber"></i>
+              <h2>Model Settings</h2>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="setting-group">
+              <label for="detectorSelect">Face Detector Model</label>
+              <div class="select-wrapper">
+                <select id="detectorSelect" class="form-select">
+                  <option value="ssd">SSD MobileNet V1 (High Accuracy)</option>
+                  <option value="tiny">Tiny Face Detector (Fast / Low CPU)</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="setting-group">
+              <div class="slider-header">
+                <label for="confidenceSlider">Min Detection Confidence</label>
+                <span class="slider-value" id="confidenceValue">0.50</span>
+              </div>
+              <input type="range" id="confidenceSlider" min="0.1" max="0.9" step="0.05" value="0.5" class="form-slider">
+            </div>
+
+            <hr class="separator">
+
+            <div class="toggle-group">
+              <div class="toggle-item">
+                <div class="toggle-label-desc">
+                  <span class="toggle-label">Render Bounding Box</span>
+                  <span class="toggle-desc">Draw green border around faces</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggleBbox" checked>
+                  <span class="slider round"></span>
+                </label>
+              </div>
+
+
+
+              <div class="toggle-item">
+                <div class="toggle-label-desc">
+                  <span class="toggle-label">Face Recognition</span>
+                  <span class="toggle-desc">Match faces with local database</span>
+                </div>
+                <label class="switch">
+                  <input type="checkbox" id="toggleRecognition" checked>
+                  <span class="slider round"></span>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Face Database Card -->
+        <div class="card database-card">
+          <div class="card-header">
+            <div class="card-title">
+              <i data-lucide="users" class="icon-green"></i>
+              <h2>Face Registry</h2>
+            </div>
+            <button id="clearDbBtn" class="btn btn-icon-only btn-danger-text" title="Clear All Registry">
+              <i data-lucide="trash-2"></i>
+            </button>
+          </div>
+          <div class="card-body p-0">
+            <!-- Register via file upload -->
+            <div class="manual-register-panel">
+              <div class="register-input-row">
+                <input type="text" id="manualNameInput" placeholder="Name for face registration" />
+                <button id="triggerManualUploadBtn" class="btn btn-accent-outline" title="Select Reference Photo">
+                  <i data-lucide="camera"></i>
+                </button>
+                <input type="file" id="manualFileInput" accept="image/*" class="hidden">
+              </div>
+            </div>
+
+            <div class="database-list-container">
+              <div class="empty-database-placeholder" id="emptyDbPlaceholder">
+                <i data-lucide="fingerprint" class="placeholder-icon-small"></i>
+                <p>No faces registered. Detect a face or upload a photo to register.</p>
+              </div>
+              <ul class="database-list" id="databaseList">
+                <!-- Template item
+                <li class="db-item">
+                  <img src="data:image/png;base64,..." alt="face thumbnail" class="db-thumb">
+                  <div class="db-details">
+                    <span class="db-name">John Doe</span>
+                    <span class="db-meta">128-dim Vector Registered</span>
+                  </div>
+                  <button class="db-delete"><i data-lucide="trash"></i></button>
+                </li>
+                -->
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Aegis Face AI &copy; 2026. Powered by TensorFlow.js & Face-API.js. Running locally and securely.</p>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+  </script>
+</body>
+</html>

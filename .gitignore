@@ -48,9 +48,19 @@ Thumbs.db
 *.log
 .pytest_cache/
 
-# Project-3 specific ignores
+# Project-3 specific ignores (legacy)
 Project-3/backend/checkpoints/model_custom.pth
 Project-3/backend/checkpoints/vocab.json
 Project-3/backend/checkpoints/train_status.json
 Project-3/.cache/
 
+# Node.js
+node_modules/
+
+# Python cache and environments
+**/__pycache__/
+*.py[cod]
+*venv/
+.venv/
+env/
+ENV/

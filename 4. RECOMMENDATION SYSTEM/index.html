@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PulseRec | Interactive Recommendation Engine</title>
+  <meta name="description" content="A premium interactive dashboard demonstrating Content-Based and Collaborative Filtering algorithms for movies, books, and products.">
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="styles.css">
+  <!-- Ionicons CDN -->
+  <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+  <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="app-sidebar">
+      <div class="sidebar-brand">
+        <div class="brand-logo">
+          <ion-icon name="pulse-outline"></ion-icon>
+        </div>
+        <span class="brand-text">PulseRec</span>
+      </div>
+
+      <nav class="sidebar-nav">
+        <button class="nav-btn active" id="btn-tab-dashboard" data-tab="dashboard">
+          <ion-icon name="grid-outline"></ion-icon>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-btn" id="btn-tab-library" data-tab="library">
+          <ion-icon name="library-outline"></ion-icon>
+          <span>Library Explorer</span>
+        </button>
+        <button class="nav-btn" id="btn-tab-visualizer" data-tab="visualizer">
+          <ion-icon name="calculator-outline"></ion-icon>
+          <span>Math Visualizer</span>
+        </button>
+        <button class="nav-btn" id="btn-tab-help" data-tab="help">
+          <ion-icon name="help-circle-outline"></ion-icon>
+          <span>How It Works</span>
+        </button>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="active-user-card">
+          <div class="user-avatar" id="sidebar-user-avatar">✨</div>
+          <div class="user-info">
+            <span class="user-name" id="sidebar-user-name">You</span>
+            <span class="user-role">Active Session</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      
+      <!-- TOP HEADER -->
+      <header class="top-header">
+        <div class="header-left">
+          <h1 id="page-title">Personalized Dashboard</h1>
+          <p class="text-secondary" id="page-subtitle">Real-time suggestions based on your preferences</p>
+        </div>
+        
+        <div class="header-right">
+          <!-- CATEGORY CHIPS -->
+          <div class="category-selector">
+            <button class="cat-chip active" id="chip-movies" data-category="movies">
+              <ion-icon name="film-outline"></ion-icon>
+              <span>Movies</span>
+            </button>
+            <button class="cat-chip" id="chip-books" data-category="books">
+              <ion-icon name="book-outline"></ion-icon>
+              <span>Books</span>
+            </button>
+            <button class="cat-chip" id="chip-products" data-category="products">
+              <ion-icon name="pricetag-outline"></ion-icon>
+              <span>Products</span>
+            </button>
+          </div>
+
+          <!-- PROFILE SELECTOR -->
+          <div class="profile-dropdown-container">
+            <label for="select-profile" class="dropdown-label">Simulate User:</label>
+            <select id="select-profile" class="profile-select">
+              <option value="active_user">✨ You (Custom Ratings)</option>
+              <option value="user_action">🚀 Alex (Action Fan)</option>
+              <option value="user_drama">🎭 Sarah (Drama Fan)</option>
+              <option value="user_intellectual">🧠 Dr. Dave (Non-Fiction)</option>
+              <option value="user_lifestyle">🥗 Emma (Fitness & Health)</option>
+              <option value="user_casual">🍿 John (Pop Thrillers)</option>
+            </select>
+          </div>
+        </div>
+      </header>
+
+      <!-- VIEWPORT PANELS -->
+      <div class="content-viewport">
+        
+        <!-- ================= TAB: DASHBOARD ================= -->
+        <section class="tab-panel active" id="panel-dashboard">
+          
+          <!-- STATS GRID -->
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-icon purple-glow">
+                <ion-icon name="star-half-outline"></ion-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="stat-rated-count">0</span>
+                <span class="stat-label">Items Rated by You</span>
+              </div>
+            </div>
+            
+            <div class="stat-card">
+              <div class="stat-icon teal-glow">
+                <ion-icon name="heart-outline"></ion-icon>
+              </div>
+              <div class="stat-content">
+                <span class="stat-value" id="stat-favorite-genre">None</span>
+                <span class="stat-label">Top Genre Affinity</span>
+              </div>
+            </div>
+            
+            <div class="stat-card algorithm-toggle-card">
+              <div class="stat-icon orange-glow">
+                <ion-icon name="git-network-outline"></ion-icon>
+              </div>
+              <div class="stat-content select-algorithm-content">
+                <span class="stat-label-large">Recommendation Engine</span>
+                <div class="engine-switch-container">
+                  <span class="engine-mode-label" id="label-engine-cb">Content-Based</span>
+                  <label class="switch">
+                    <input type="checkbox" id="toggle-algorithm">
+                    <span class="slider round"></span>
+                  </label>
+                  <span class="engine-mode-label active" id="label-engine-cf">Collaborative</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- DASHBOARD MAIN LAYOUT -->
+          <div class="dashboard-layout">
+            
+            <!-- RECOMMENDATIONS SECTION -->
+            <div class="dashboard-main">
+              <div class="section-header">
+                <h2>Top Recommendations for You</h2>
+                <div class="badge glow" id="badge-engine-type">Collaborative Filtering</div>
+              </div>
+              
+              <div class="rec-grid" id="container-recommendations">
+                <!-- Dynamically populated recommendations cards -->
+              </div>
+            </div>
+            
+            <!-- SIDEBAR DETAILS: MY CURRENT RATINGS -->
+            <aside class="dashboard-side">
+              <div class="side-card">
+                <h3>Your Ratings Breakdown</h3>
+                <p class="text-secondary text-sm">Ratings you've submitted that power the algorithms.</p>
+                
+                <div class="ratings-list-scroll">
+                  <div class="ratings-list" id="container-user-ratings">
+                    <!-- Dynamically populated rating items -->
+                  </div>
+                </div>
+
+                <div class="ratings-card-footer">
+                  <button class="btn btn-secondary btn-full" id="btn-reset-ratings">
+                    <ion-icon name="refresh-outline"></ion-icon>
+                    <span>Reset All Ratings</span>
+                  </button>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <!-- ================= TAB: LIBRARY EXPLORER ================= -->
+        <section class="tab-panel" id="panel-library">
+          <!-- SEARCH & FILTER BAR -->
+          <div class="library-filter-bar">
+            <div class="search-input-container">
+              <ion-icon name="search-outline"></ion-icon>
+              <input type="text" id="input-library-search" placeholder="Search by title, creator, or descriptions...">
+            </div>
+            
+            <div class="genre-chips-container" id="container-genre-filters">
+              <!-- Dynamically populated category genre filters -->
+            </div>
+
+            <button class="btn btn-primary" id="btn-add-item-modal">
+              <ion-icon name="add-circle-outline"></ion-icon>
+              <span>Add Custom Item</span>
+            </button>
+          </div>
+
+          <!-- LIBRARY ITEMS GRID -->
+          <div class="library-grid" id="container-library-grid">
+            <!-- Dynamically populated items database -->
+          </div>
+        </section>
+
+        <!-- ================= TAB: MATH VISUALIZER ================= -->
+        <section class="tab-panel" id="panel-visualizer">
+          <div class="visualizer-layout">
+            
+            <!-- ALGORITHM EXPLANATION CARD -->
+            <div class="visualizer-header-card">
+              <div class="visualizer-header-title">
+                <ion-icon name="analytics-outline" class="title-icon"></ion-icon>
+                <div>
+                  <h2 id="visualizer-algorithm-title">Collaborative Filtering Algorithm</h2>
+                  <p class="text-secondary" id="visualizer-algorithm-description">Calculating recommendations by comparing your ratings with other simulated profiles.</p>
+                </div>
+              </div>
+              
+              <div class="visualizer-formula-box" id="container-formula-box">
+                <!-- Formula markdown / math expression will be rendered here -->
+              </div>
+            </div>
+
+            <!-- VISUALIZER COLUMNS -->
+            <div class="visualizer-grid">
+              
+              <!-- LEFT COLUMN: SIMILARITIES / PROFILE VECTORS -->
+              <div class="visualizer-column">
+                <div class="side-card">
+                  <h3 id="visualizer-left-column-title">User Similarity Indices</h3>
+                  <p class="text-secondary text-sm" id="visualizer-left-column-desc">Centered Cosine Similarity scores (equivalent to Pearson Correlation).</p>
+                  
+                  <div class="similarity-container" id="container-similarities-list">
+                    <!-- Progress bars / ratings showing similarities -->
+                  </div>
+                </div>
+              </div>
+
+              <!-- RIGHT COLUMN: STEP-BY-STEP RATING PREDICTION -->
+              <div class="visualizer-column double-width">
+                <div class="side-card">
+                  <h3 id="visualizer-right-column-title">How Recommendation Scores are Computed</h3>
+                  <p class="text-secondary text-sm">Select an item below to see the exact formula execution breakdown.</p>
+                  
+                  <!-- ITEM CHIPS SELECTOR FOR PREDICTION -->
+                  <div class="item-prediction-selector" id="container-prediction-item-selector">
+                    <!-- Chips of unrated items -->
+                  </div>
+
+                  <!-- MATH CALCULATION DETAILS CONTAINER -->
+                  <div class="math-calculation-card" id="container-math-calculation-details">
+                    <!-- Mathematical explanation trace details -->
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+        <!-- ================= TAB: HOW IT WORKS ================= -->
+        <section class="tab-panel" id="panel-help">
+          <div class="help-layout">
+            
+            <div class="help-section">
+              <div class="help-icon purple-glow"><ion-icon name="git-branch-outline"></ion-icon></div>
+              <h2>Content-Based Filtering (CB)</h2>
+              <p>Content-based systems suggest items based on their properties and what you've liked in the past. If you rate sci-fi movies highly, the system understands you like sci-fi and recommends other sci-fi movies.</p>
+              
+              <div class="help-sub-block">
+                <h4>1. Vector Representation</h4>
+                <p>Every item is represented as a vector of genres. For instance, in a system with genres <strong>[Action, Sci-Fi, Drama]</strong>, a pure Action film is <code>[1, 0, 0]</code>, and a Sci-Fi Action movie is <code>[1, 1, 0]</code>.</p>
+              </div>
+
+              <div class="help-sub-block">
+                <h4>2. Creating your Preference Vector</h4>
+                <p>We compile your ratings ($R_i$). For each rated item, we take its genre vector and scale it by a rating weight (we use $Rating - 2.5$). If you rate a movie 5 stars, we add $+2.5$ times its vector. If you rate it 1 star, we subtract $-1.5$ times its vector. Summing and normalizing these gives your **Preference Vector** (representing your genre affinities).</p>
+              </div>
+
+              <div class="help-sub-block">
+                <h4>3. Calculating Cosine Similarity</h4>
+                <p>We compare your Preference Vector ($\vec{U}$) against each unrated item's genre vector ($\vec{I}$) using the Cosine Similarity formula:</p>
+                <div class="math-formula">
+                  $$\text{Similarity}(\vec{U}, \vec{I}) = \cos(\theta) = \frac{\vec{U} \cdot \vec{I}}{\|\vec{U}\| \|\vec{I}\|}$$
+                </div>
+                <p>This outputs a score between -1.0 (opposite interests) and 1.0 (exact match). Items are sorted by this similarity score.</p>
+              </div>
+            </div>
+
+            <div class="help-section">
+              <div class="help-icon teal-glow"><ion-icon name="people-outline"></ion-icon></div>
+              <h2>User-Based Collaborative Filtering (CF)</h2>
+              <p>Collaborative filtering is based on the idea that if users agreed in the past, they will agree in the future. Instead of item attributes, it analyzes patterns in ratings from a community of users.</p>
+
+              <div class="help-sub-block">
+                <h4>1. Adjusting for User Rating Bias</h4>
+                <p>Different users rate differently: some are generous (average rating 4.5), others are harsh (average rating 2.5). To align ratings, we compute each user's average rating ($\bar{R}_u$) and **mean-center** their rating vectors ($R_{u, i} - \bar{R}_u$). Unrated items are set to 0 (neutral/mean).</p>
+              </div>
+
+              <div class="help-sub-block">
+                <h4>2. Calculating User Similarity</h4>
+                <p>We compute Centered Cosine Similarity (Pearson Correlation) between you and other users. A score of $1.0$ means your tastes are perfectly aligned, $0.0$ means no correlation, and $-1.0$ means opposite tastes.</p>
+              </div>
+
+              <div class="help-sub-block">
+                <h4>3. Predicting Ratings (Weighted Average)</h4>
+                <p>To predict your rating ($P_{u, p}$) for an unrated item $p$, we take your average rating ($\bar{R}_u$) and add a weighted average of other users' centered ratings for item $p$, weighted by their similarity to you ($w_{u, v}$):</p>
+                <div class="math-formula">
+                  $$P_{u, p} = \bar{R}_u + \frac{\sum_{v \in \text{Neighbors}} w_{u, v} \cdot (R_{v, p} - \bar{R}_v)}{\sum_{v \in \text{Neighbors}} |w_{u, v}|}$$
+                </div>
+                <p>This projects a rating from 1 to 5. We recommend the items with the highest predicted ratings.</p>
+              </div>
+            </div>
+
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= ADD ITEM MODAL ================= -->
+  <div class="modal-overlay" id="modal-add-item">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3>Add New Item to Library</h3>
+        <button class="btn-close-modal" id="btn-close-add-modal">
+          <ion-icon name="close-outline"></ion-icon>
+        </button>
+      </div>
+      
+      <form id="form-add-item" class="modal-form">
+        <div class="form-group">
+          <label for="input-item-title">Title</label>
+          <input type="text" id="input-item-title" required placeholder="e.g. The Shawshank Redemption">
+        </div>
+
+        <div class="form-group" id="group-creator">
+          <label for="input-item-creator" id="label-item-creator">Director / Author / Brand</label>
+          <input type="text" id="input-item-creator" required placeholder="e.g. Frank Darabont">
+        </div>
+
+        <div class="form-group row-group">
+          <div class="half-group">
+            <label for="input-item-extra" id="label-item-extra">Year / Attribute</label>
+            <input type="text" id="input-item-extra" placeholder="e.g. 1994">
+          </div>
+          <div class="half-group">
+            <label for="select-item-category">Category</label>
+            <select id="select-item-category">
+              <option value="movies">Movies</option>
+              <option value="books">Books</option>
+              <option value="products">Products</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="input-item-description">Description</label>
+          <textarea id="input-item-description" rows="3" required placeholder="Brief summary or product description..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Genres / Tags (Comma separated)</label>
+          <input type="text" id="input-item-genres" required placeholder="e.g. Drama, Crime, Classic">
+        </div>
+
+        <div class="form-actions">
+          <button type="button" class="btn btn-secondary" id="btn-cancel-add-modal">Cancel</button>
+          <button type="submit" class="btn btn-primary">Add Item</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- JavaScript imports -->
+  <script src="data.js"></script>
+  <script src="recommendation.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

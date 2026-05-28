@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="emerald-glass">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ app_name }} - Advanced Intelligent Rule-Based Chatbot</title>
+  <meta name="description" content="IntelliBot: A high-performance rule-based chatbot featuring context awareness, real-time analytics, speech synthesis, and an interactive admin training dashboard.">
+  
+  <!-- Modern Premium Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="glow-bg"></div>
+  
+  <main class="app-container">
+    <!-- Chat Section -->
+    <section class="chat-panel" aria-label="Chatbot Interface">
+      <header class="chat-header">
+        <div class="header-left">
+          <div class="bot-avatar-glow">
+            <svg class="bot-icon" viewBox="0 0 24 24" width="24" height="24">
+              <path fill="currentColor" d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12A10 10 0 0 1 12 2m0 2c-4.42 0-8 3.58-8 8s3.58 8 8 8 8-3.58 8-8-3.58-8-8-8m1 3v2h2v2h-2v2h-2V9H9V7h2V5h2v2h1v2m-6 6a2 2 0 1 0 0 4 2 2 0 0 0 0-4m10 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+            </svg>
+          </div>
+          <div>
+            <h1>IntelliBot <span class="badge">v2.0</span></h1>
+            <p class="status-sub"><span class="status-dot"></span> Online & learning</p>
+          </div>
+        </div>
+        
+        <div class="header-actions">
+          <!-- Text-to-Speech Toggle -->
+          <button id="ttsToggle" class="icon-btn" title="Toggle Voice Response" aria-label="Toggle Voice Response">
+            <svg class="tts-icon-off" viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M3.9 2.63L2.5 4.03l3 3V17h4l5 5v-5.17l4.63 4.63 1.4-1.41L3.9 2.63M12 15.17L9.83 13H7.5V9h.17l4.33 4.33v1.84M16.5 12c0-1.77-1.02-3.29-2.5-4.03V5l5 5-2.5 2M14 3.23v2.06c2.89.86 5 3.54 5 6.71 0 1.25-.34 2.43-.93 3.44l1.5 1.5A10.93 10.93 0 0 0 21 12c0-5.3-3.89-9.7-9-10.77z"/>
+            </svg>
+            <svg class="tts-icon-on hidden" viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77M16.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02M5 9v6h4l5 5V4L9 9H5z"/>
+            </svg>
+          </button>
+          
+          <!-- Sidebar Toggle -->
+          <button id="sidebarToggle" class="icon-btn" title="Toggle Dashboard" aria-label="Toggle Dashboard">
+            <svg viewBox="0 0 24 24" width="20" height="20">
+              <path fill="currentColor" d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2m-7 16H5V5h7v14m7 0h-5V5h5v14z"/>
+            </svg>
+          </button>
+        </div>
+      </header>
+
+      <!-- Chat Messages Container -->
+      <div id="chatMessages" class="chat-messages" aria-live="polite">
+        <article class="message bot animate-fade-in">
+          <div class="message-content">
+            <p>Greetings! I am IntelliBot, a rule-based intelligent agent. Try testing my skills: ask for a joke, tell me your name, calculate math, or ask me a riddle!</p>
+          </div>
+          <span class="meta"><span class="badge-intent">system</span> | Confidence: 100%</span>
+        </article>
+      </div>
+
+      <!-- Quick Suggestion Pills -->
+      <div class="suggestion-container">
+        <div class="suggestion-pills">
+          <button class="pill-btn" data-query="Tell me a programming joke">💻 Python Joke</button>
+          <button class="pill-btn" data-query="Ask me a riddle">🧠 Riddle Me</button>
+          <button class="pill-btn" data-query="Calculate (45 - 15) * 3 / 2">🔢 Solve Math</button>
+          <button class="pill-btn" data-query="What is the current time?">📅 Get Time</button>
+          <button class="pill-btn" data-query="Tell me a fun fact">💡 Fun Fact</button>
+        </div>
+      </div>
+
+      <!-- Chat Form -->
+      <form id="chatForm" class="chat-form">
+        <!-- Voice input button -->
+        <button id="sttToggle" type="button" class="form-icon-btn" title="Speech to Text" aria-label="Speech to Text">
+          <svg viewBox="0 0 24 24" width="20" height="20">
+            <path fill="currentColor" d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3m5.3-3c0 3-2.54 5.1-5.3 5.1S6.7 14 6.7 11H5c0 3.41 2.72 6.23 6 6.72V21h2v-3.28c3.28-.48 6-3.3 6-6.72h-1.7z"/>
+          </svg>
+        </button>
+        
+        <input id="messageInput" type="text" autocomplete="off" placeholder="Type your message..." aria-label="Type your message">
+        <button type="submit" class="send-btn">
+          <span>Send</span>
+          <svg class="send-icon" viewBox="0 0 24 24" width="16" height="16">
+            <path fill="currentColor" d="M2 21l21-9L2 3v7l15 2-15 2v7z"/>
+          </svg>
+        </button>
+      </form>
+    </section>
+
+    <!-- Sidebar Dashboard & Learning Control -->
+    <aside id="dashboardSidebar" class="dashboard-sidebar">
+      <header class="sidebar-header">
+        <h2>Dashboard & Trainer</h2>
+        
+        <!-- Theme Dropdown -->
+        <div class="theme-select-container">
+          <select id="themeSelector" aria-label="Change Color Theme">
+            <option value="emerald-glass">Emerald Glass (Dark)</option>
+            <option value="midnight-cyber">Midnight Cyber (Neon)</option>
+            <option value="sleek-light">Sleek Light (Clean)</option>
+          </select>
+        </div>
+      </header>
+
+      <!-- Sidebar Tabs Control -->
+      <div class="sidebar-tabs">
+        <button id="tabBtnAnalytics" class="tab-btn active" data-tab="tabAnalytics">Analytics & Context</button>
+        <button id="tabBtnTrainer" class="tab-btn" data-tab="tabTrainer">Bot Trainer</button>
+      </div>
+
+      <!-- Tab content: Analytics -->
+      <div id="tabAnalytics" class="tab-content active">
+        <!-- Session Context Status -->
+        <div class="stats-card">
+          <h3>Active Conversation Context</h3>
+          <div class="context-grid">
+            <div class="context-item">
+              <span class="label">User Name:</span>
+              <span id="contextUserName" class="val">Not Set</span>
+            </div>
+            <div class="context-item">
+              <span class="label">Detected Mood:</span>
+              <span id="contextMood" class="val">Not Set</span>
+            </div>
+            <div class="context-item">
+              <span class="label">Context Depth:</span>
+              <span id="contextMessagesCount" class="val">0 / 12</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Chat Statistics -->
+        <div class="stats-card">
+          <h3>Real-time Metrics</h3>
+          <div class="metrics-grid">
+            <div class="metric-item">
+              <span id="metricTotalMessages" class="metric-val">0</span>
+              <span class="metric-label">Messages</span>
+            </div>
+            <div class="metric-item">
+              <span id="metricFeedbackRatio" class="metric-val">0%</span>
+              <span class="metric-label">Helpful Rate</span>
+            </div>
+          </div>
+          
+          <div class="intent-chart-container">
+            <h4>Intent Trigger Frequencies</h4>
+            <div id="intentBarsList" class="intent-bars-list">
+              <p class="muted-text">Send messages to populate analytics...</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- System Settings -->
+        <div class="stats-card danger-zone">
+          <h3>System Settings</h3>
+          <button id="clearHistoryBtn" class="danger-btn">
+            Clear Chat Context & Stats
+          </button>
+        </div>
+      </div>
+
+      <!-- Tab content: Bot Trainer -->
+      <div id="tabTrainer" class="tab-content">
+        <div class="stats-card">
+          <h3>Logged Questions Pending Training</h3>
+          <p class="section-desc">When the bot responds with low confidence (&lt;45%) or fallbacks, it logs the queries here for developer revision.</p>
+          
+          <div class="trainer-lists">
+            <div class="list-section">
+              <h4>Unknown Questions (<span id="unknownCount">0</span>)</h4>
+              <ul id="unknownList" class="query-log-list">
+                <li class="empty-item">No unknown queries logged</li>
+              </ul>
+            </div>
+            
+            <div class="list-section">
+              <h4>Low Confidence Messages (<span id="lowConfidenceCount">0</span>)</h4>
+              <ul id="lowConfidenceList" class="query-log-list">
+                <li class="empty-item">No low-confidence queries logged</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Interactive Training Form -->
+        <div id="trainingFormCard" class="stats-card training-form-card hidden">
+          <h3 id="trainerFormTitle">Teach Bot New Response</h3>
+          <form id="teachForm" class="teach-form">
+            <!-- Target Query being trained -->
+            <input type="hidden" id="trainedQueryInput">
+            
+            <div class="form-group">
+              <label for="trainerQueryDisplay">Message to Train</label>
+              <input type="text" id="trainerQueryDisplay" readonly>
+            </div>
+            
+            <div class="form-group">
+              <label for="intentSelect">Intent Category</label>
+              <div class="intent-input-row">
+                <select id="intentSelect">
+                  <option value="" disabled selected>-- Select Existing Intent --</option>
+                  <!-- Populated dynamically -->
+                </select>
+                <button type="button" id="toggleNewIntentBtn" class="secondary-btn">New</button>
+              </div>
+              <input type="text" id="newIntentInput" class="hidden" placeholder="Enter custom intent name (e.g. weather)">
+            </div>
+            
+            <div class="form-group">
+              <label for="teachPattern">Regex Pattern (optional)</label>
+              <input type="text" id="teachPattern" placeholder="e.g. \\b(weather|rain|temperature)\\b">
+            </div>
+
+            <div class="form-group">
+              <label for="teachKeyword">Fuzzy Keyword (optional)</label>
+              <input type="text" id="teachKeyword" placeholder="e.g. weather">
+            </div>
+            
+            <div class="form-group">
+              <label for="teachResponse">Bot Response Template</label>
+              <textarea id="teachResponse" required placeholder="e.g. The weather is currently simulated. Try testing other skills!"></textarea>
+              <span class="field-info">Use placeholders: {user_name}, {captured_name}, {mood}, {now}</span>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" class="primary-btn">Save Rule & Load</button>
+              <button type="button" id="cancelTeachBtn" class="secondary-btn">Cancel</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </aside>
+  </main>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
